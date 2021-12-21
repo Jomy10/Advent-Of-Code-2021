@@ -1,1 +1,3 @@
 /target
+.DS_STORE
+src/day3/node/node_modules
