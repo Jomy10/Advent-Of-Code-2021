@@ -1,4 +1,97 @@
-let data = [
+/**
+ * Finds the most common bit in of the array at the index
+ * @param {[String]} arr 
+ * @param {Integer} index 
+ * @returns The most common bit
+ */
+const mostCommon = (arr, index) => {
+    let one = 0;
+    for (let i = 0; i < arr.length; i++) {
+        a = arr[i]
+        if (a[index] == 1 ){
+            one++;
+        } else if (a[index] == 0) {
+            
+        } else {
+            console.log("Error")
+        }
+    }
+    if (one >= arr.length / 2) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+/**
+ * Finds the o2 parameter
+ * @param {[String]} arr 
+ * @returns The filtered array
+ */
+const o2 = (arr) => {
+    let tmp = arr
+
+    for (let pos = 0; pos < 12; pos++) {
+        let common = mostCommon(tmp, pos);
+        // console.log("common:", common);
+        tmp = tmp.filter(bit => {
+            // console.log(bit[pos], common, bit[pos] == common);
+            return bit[pos] == common
+        });
+
+        if (tmp.length == 1) {
+            return tmp
+        }
+    }
+}
+
+/**
+ * Finds the co2 parameter
+ * @param {[String]} arr 
+ * @returns The filtered array
+ */
+const co2 = (arr) => {
+    let tmp = arr
+
+    for (let pos = 0; pos < 12; pos++) {
+        let least_common = !mostCommon(tmp, pos);
+        tmp = tmp.filter(bit => {
+            // console.log(bit[pos], least_common, bit[pos] == least_common);
+            return bit[pos] == least_common
+        });
+
+        if (tmp.length == 1) {
+            return tmp
+        }
+    }
+}
+
+/**
+ * Converts a binary string to a decimal representation
+ * @param {String} bin 
+ * @returns The decimal represenation of <code>bin</code>
+ */
+function bin_to_dec(bin) {
+    let out = 0;
+    for (let i = 0; i < bin.length; i++) {
+        let s = parseInt(bin[i]);
+        out += s * Math.pow(2, bin.length - i - 1);
+    }
+    return out
+} 
+
+// Ratings as string
+let o2_s = o2(getData())[0];
+let co2_s = co2(getData())[0];
+// 
+console.log("o2:", o2_s, "co2:", co2_s);
+
+console.log("o2:", bin_to_dec(o2_s), "co2", bin_to_dec(co2_s));
+console.log("Answer:", bin_to_dec(o2_s) * bin_to_dec(co2_s));
+
+
+const getData = () => {
+    return [
     "101000111100",
     "000011111101",
     "011100000100",
@@ -1000,94 +1093,4 @@ let data = [
     "000111100111",
     "110111100100"
 ]
-
-/**
- * Finds the most common bit in of the array at the index
- * @param {[String]} arr 
- * @param {Integer} index 
- * @returns The most common bit
- */
-const mostCommon = (arr, index) => {
-    let one = 0;
-    for (let i = 0; i < arr.length; i++) {
-        a = arr[i]
-        if (a[index] == 1 ){
-            one++;
-        } else if (a[index] == 0) {
-            
-        } else {
-            console.log("Error")
-        }
-    }
-    if (one >= arr.length / 2) {
-        return 1
-    } else {
-        return 0
-    }
 }
-
-/**
- * Finds the o2 parameter
- * @param {[String]} arr 
- * @returns The filtered array
- */
-const o2 = (arr) => {
-    let tmp = arr
-
-    for (let pos = 0; pos < 12; pos++) {
-        let common = mostCommon(tmp, pos);
-        // console.log("common:", common);
-        tmp = tmp.filter(bit => {
-            // console.log(bit[pos], common, bit[pos] == common);
-            return bit[pos] == common
-        });
-
-        if (tmp.length == 1) {
-            return tmp
-        }
-    }
-}
-
-/**
- * Finds the co2 parameter
- * @param {[String]} arr 
- * @returns The filtered array
- */
-const co2 = (arr) => {
-    let tmp = arr
-
-    for (let pos = 0; pos < 12; pos++) {
-        let least_common = !mostCommon(tmp, pos);
-        tmp = tmp.filter(bit => {
-            // console.log(bit[pos], least_common, bit[pos] == least_common);
-            return bit[pos] == least_common
-        });
-
-        if (tmp.length == 1) {
-            return tmp
-        }
-    }
-}
-
-/**
- * Converts a binary string to a decimal representation
- * @param {String} bin 
- * @returns The decimal represenation of <code>bin</code>
- */
-function bin_to_dec(bin) {
-    let out = 0;
-    for (let i = 0; i < bin.length; i++) {
-        let s = parseInt(bin[i]);
-        out += s * Math.pow(2, bin.length - i - 1);
-    }
-    return out
-} 
-
-// Ratings as string
-let o2_s = o2(data)[0];
-let co2_s = co2(data)[0];
-// 
-console.log("o2:", o2_s, "co2:", co2_s);
-
-console.log("o2:", bin_to_dec(o2_s), "co2", bin_to_dec(co2_s));
-console.log("Answer:", bin_to_dec(o2_s) * bin_to_dec(co2_s));
