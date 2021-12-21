@@ -1086,7 +1086,7 @@ function bin_to_dec(bin) {
 // Ratings as string
 let o2_s = o2(data)[0];
 let co2_s = co2(data)[0];
-// 
+
 console.log("o2:", o2_s, "co2:", co2_s);
 
 console.log("o2:", bin_to_dec(o2_s), "co2", bin_to_dec(co2_s));
