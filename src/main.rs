@@ -1,5 +1,13 @@
 fn main() {
-    println!("{:?}", o2(&get_input()));
+    let input = get_input();
+    let o2 = o2(&input);
+    let co2 = co2(&input);
+    println!("{:?}", o2);
+    println!("{:?}", co2);
+    let o2 = bits_to_dec(o2[0]);
+    let co2 = bits_to_dec(co2[0]);
+    println!("o2: {}, co2: {}", o2, co2);
+    println!("Result: {}", o2 * co2);
 }
 
 /// Returns the most common bit of the array at a given position
@@ -41,6 +49,34 @@ fn o2<'a>(data: &'a [&str; 1000]) -> Vec<&'a str> {
     return local;
 }
 
+fn co2<'a>(data: &'a [&str; 1000]) -> Vec<&'a str> {
+    let mut local = data.to_vec();
+    
+    for pos in 0..12 {
+        let least_commmon = if most_common(&local, pos) == 1 { 0 } else { 1 };
+        
+        local = local.into_iter().filter(|byte| {
+            byte[pos..pos+1].to_string() == least_commmon.to_string()
+        }).collect();
+        
+        if local.len() == 1 {
+            return local;
+        }
+    }
+    
+    return local;
+}
+
+fn bits_to_dec(str: &str) -> i32 {
+    let mut dec = 0;
+    for i in 0..str.len() {
+        let s = &str[str.len()-i-1..str.len()-i];
+        let s: i32 = s.parse::<i32>().unwrap();
+        let s: i32 = s * 2_i32.pow(i as u32);
+        dec += s;
+    }
+    dec
+}
 
 fn get_input() -> [&'static str; 1000] {
     return [
