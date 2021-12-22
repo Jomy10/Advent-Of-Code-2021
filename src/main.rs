@@ -1,6 +1,3 @@
-use std::cmp::min;
-use std::fs;
-
 fn main() {
     println!("{:?}", o2(&get_input()));
 }
@@ -19,7 +16,7 @@ fn most_common(arr: &Vec<&str>, index: usize) -> i32 {
         }
     }
     
-    if one >= arr.len() / 2 {
+    if one >= f32::ceil(arr.len() as f32 / 2.0) as i32 {
         1
     } else {
         0
