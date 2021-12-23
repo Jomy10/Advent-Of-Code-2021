@@ -1,5 +1,6 @@
 //! Day 5: Hydrothermal ventures
 
+use std::cmp::max;
 use std::fmt::{Debug, Formatter};
 use std::fs;
 use std::io::Write;
@@ -12,6 +13,12 @@ fn main() {
     let lines: Vec<Line> = input.into_iter().map(|line| {
         Line::from_str(line)
     }).collect();
+    
+    // let lines2 = [
+    //     Line::new(Point::new(3,3), Point::new(3,7)),
+    //     Line::new(Point::new(1,1), Point::new(2,2)),
+    //     Line::new(Point::new(0,0), Point::new(100,100)),
+    // ].to_vec();
     
     let mut grid = Grid::new(lines);
     grid.populate_grid();
@@ -96,7 +103,8 @@ impl Grid {
                     }
                 }
             }
-        } else if line.p1.y == line.p2.y {
+        }
+        else if line.p1.y == line.p2.y {
             let y: usize = line.p1.y as usize;
     
             if line.p1.x < line.p2.x {
@@ -121,8 +129,46 @@ impl Grid {
                 }
             }
         }
+        // Part 2
+        else {
+            // Diagonal lines
+            let diff = (line.p1.x as i32-line.p2.x as i32);
+            let mut _ref = 0;
+            if diff > 0 {
+                _ref = diff;
+            } else if diff < 0 {
+                _ref = -diff;
+            } else {
+                panic!("A vertical line is being processed in the diagonal lines.");
+            }
+            
+            let operator_x = if diff > 0 { Operator::Min } else { Operator::Plus };
+            let operator_y = if line.p1.y > line.p2.y { Operator::Min } else { Operator::Plus };
+            
+            let mut x = line.p1.x as usize;
+            let mut y = line.p1.y as usize;
+            println!("ref: {} | ({}, {})", _ref, line.p1.x, line.p2.x);
+            for i in 0.._ref+1 {
+                if self.grid[x][y] == '.' {
+                    self.grid[x][y] = '1';
+                } else {
+                    self.grid[x][y] = char::from_digit(((self.grid[x][y] as u32 - 0x30) + 1), 10).unwrap();
+                }
+                
+                x = match operator_x {
+                    Operator::Plus => x + 1,
+                    Operator::Min => x - 1,
+                };
+    
+                y = match operator_y {
+                    Operator::Plus => y + 1,
+                    Operator::Min => y - 1,
+                };
+            }
+        }
     }
     
+    /// Returns the amount of overlapping points in the grid
     pub fn amt_overlap(&self) -> u32 {
         let mut amt: u32 = 0;
         self.grid.iter().for_each(|val| {
@@ -137,6 +183,11 @@ impl Grid {
         
         amt
     }
+}
+
+enum Operator {
+    Plus,
+    Min
 }
 
 #[derive(Debug, Copy, Clone)]
