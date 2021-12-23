@@ -76,6 +76,7 @@ impl Game {
         println!("boards: {:?}\n", boards);
         println!("len: {}", boards.len());
         
+        let mut loser: u128 = 0;
         // loop over each round
         for number in &self.numbers.to_owned() {
             println!("{}", number.to_string().green());
@@ -109,9 +110,15 @@ impl Game {
                 return &self.boards[0];
             }
             ).collect::<Vec<&Board>>()).red(), format!("{:?}", boards).green(), format!("{}", number).blue());
+            // This is the board that will lose
             if boards.len() == 1 {
-                let board = self.find_board(boards[0]).unwrap();
-                return (board, number.to_owned());
+                // let board = self.find_board(boards[0]).unwrap();
+                // return (board, number.to_owned());
+                loser = boards[0];
+            }
+            // Reached when the losing board finally wins
+            if boards.len() == 0 {
+                return (self.find_board(loser).unwrap(), number.to_owned());
             }
         }
         
