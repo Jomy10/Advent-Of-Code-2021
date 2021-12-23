@@ -3,10 +3,11 @@ use std::fmt::{Debug, Formatter};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use crossterm::execute;
+use std::ops::Index;
 use uuid::Uuid;
+use colored::*;
 
-fn main() {
+fn part1() {
     let rnd = get_rnd("src/inputs/day4-rnd.txt");
     let boards = Board::multiple_from_file("src/inputs/day4-boards.txt");
     
@@ -20,11 +21,36 @@ fn main() {
             
             let sum = winning_board[0].sum_unchecked();
             let final_score = sum * number;
-    
+            
+            println!("{:?}", winning_board[0]);
+            
             println!("The final score is {}", final_score);
         },
         Err(err) => println!("{}", err)
     }
+}
+
+fn part2() {
+    let rnd = get_rnd("src/inputs/day4-rnd.txt");
+    let boards = Board::multiple_from_file("src/inputs/day4-boards.txt");
+    
+    let mut game = Game::new(rnd, boards);
+    let last_board = game.last_to_win();
+    
+    // 4158 too low
+    let board = last_board.0;
+    let number = last_board.1;
+    let sum = board.sum_unchecked();
+    let final_score = sum * number;
+    println!("board: {}", board.id.to_string().green());
+    println!("{} | {}", number, sum);
+    println!("The final score is {}.", final_score.to_string().green());
+    
+    println!("{}", format!("{:?}", board).cyan());
+}
+
+fn main() {
+    part2()
 }
 
 #[derive(serde::Serialize)]
@@ -41,12 +67,62 @@ impl Game {
         }
     }
     
+    pub fn last_to_win(&mut self) -> (&Board, u32) {
+        // All the boards, we will remove boards that have won from this vec until it only has 1 element
+        let mut boards: Vec<u128> = Vec::new();
+        for board in &self.boards {
+            boards.push(board.id);
+        }
+        println!("boards: {:?}\n", boards);
+        println!("len: {}", boards.len());
+        
+        // loop over each round
+        for number in &self.numbers.to_owned() {
+            println!("{}", number.to_string().green());
+            // Cross out matching numbers on the boards
+            self.cross_numbers(number.to_owned());
+            
+            // Check for winners
+            let winners = self.check_victory();
+            
+            // remove winners from the vec
+            for winner in &winners {
+                // println!("Winner: {}", winner);
+                // for i in 0..boards.len() {
+                //     if boards[i] == winner {
+                //         println!("Found winner at {}! The winner is {}", i, winner);
+                //         boards.swap_remove(i);
+                //     }
+                // }
+                if boards.contains(winner) {
+                    boards = boards.into_iter().filter(|value| value != winner).collect();
+                }
+            }
+    
+            println!("{}{} at {}", format!("{:?}", winners.iter().map(|val| {
+                for b in &self.boards {
+                    if &b.id == val {
+                        return b;
+                    }
+                }
+                println!("ERROR");
+                return &self.boards[0];
+            }
+            ).collect::<Vec<&Board>>()).red(), format!("{:?}", boards).green(), format!("{}", number).blue());
+            if boards.len() == 1 {
+                let board = self.find_board(boards[0]).unwrap();
+                return (board, number.to_owned());
+            }
+        }
+        
+        panic!("No one loses!");
+    }
+    
     /// Finds the first board that will win this game
     /// # Returns
     /// - `Ok((Vec<&Board>, u32))`: The board(s) that won and the number at which they won
     pub fn first_to_win(&mut self) -> Result<(Vec<&Board>, u32), &str> {
         // Loop over each round
-        let mut excecute_count: u32 = 0;
         for number in &self.numbers.to_owned() {
             // cross out any matching numbers on the boards
             self.cross_numbers(number.to_owned());
@@ -92,7 +168,7 @@ impl Game {
         victorious_boards
     }
     
-    /// Returns true if the board at index i has won, false otherwise
+    /// Returns true if the board with the given id has won, false otherwise
     fn check_board_victory(&self, id: u128) -> bool {
         let board: &Vec<&Board> = &self.boards.iter().filter(|board| board.id == id).collect();
         let board = &board[0];
