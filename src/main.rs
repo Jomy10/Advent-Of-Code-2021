@@ -21,9 +21,6 @@ fn main() {
             let sum = winning_board[0].sum_unchecked();
             let final_score = sum * number;
     
-            println!("{:?}", winning_board[0]);
-            
-            println!("{} | {}", sum, number);
             println!("The final score is {}", final_score);
         },
         Err(err) => println!("{}", err)
@@ -63,14 +60,6 @@ impl Game {
                 }
                 return Ok((_winners, number.to_owned()));
             }
-            // DEBUG //
-            println!("Serializing state...");
-            let serialized_game = serde_json::to_string_pretty(&self).unwrap();
-            fs::create_dir("src/outputs");
-            let mut buffer = File::create(format!("src/outputs/{}.json", excecute_count)).unwrap();
-            buffer.write_all(serialized_game.as_ref());
-            excecute_count += 1;
-            // END DEBUG //
         }
         Err("This game has no winners")
     }
