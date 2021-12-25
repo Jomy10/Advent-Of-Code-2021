@@ -1,68 +1,53 @@
-//! day 6: Lanternfish
-//!
-//! Day 6 was pretty easy, however: I should've probably grouped fish with similar age to make this
-//! run faster. Because right now it's pretty slow.
-//!
-//! UPDATE: Optimized day 6 in `new_method()`
+//! day 7
+//!       __________...----..____..-'``-..___
+//!     ,'.                                  ```--.._
+//!    :                                             ``._
+//!    |                           --                    ``.
+//!    |                   -.-      -.     -   -.        `.
+//!    :                     __           --            .     \
+//!     `._____________     (  `.   -.-      --  -   .   `     \
+//!        `-----------------\   \_.--------..__..--.._ `. `.   :
+//!                           `--'     SSt             `-._ .   |
+//!                                                        `.`  |
+//!                                                          \` |
+//!                                                           \ |
+//!                                                           / \`.
+//!                                                          /  _\-'
+//!                                                         /_,'
 
 use std::fs;
 
 fn main() {
-    new_method()
-}
-
-fn new_method() {
-    const DAYS: usize = 256;
+	let init_crab_pos: Vec<u32> = fs::read_to_string("src/inputs/day7.txt").unwrap()
+        .split(",")
+        .map(|str| str.parse::<u32>().unwrap())
+        .collect();
     
-    let input = fs::read_to_string("src/inputs/day6.txt").unwrap();
-    let input: Vec<&str> = input.split(",").collect();
-    let input: Vec<usize> = input.into_iter().map(|val| val.parse::<usize>().unwrap()).collect();
+    let min = init_crab_pos.iter().min().unwrap().clone();
+    let max = init_crab_pos.iter().max().unwrap().clone();
     
-    // Represents the amount of fish with a specific lifetime
-    let mut fishes: [usize; 9] = [0; 9];
-    
-    for i in input {
-        fishes[i] += 1;
-    }
-    
-    // Simulate
-    for _ in 0..DAYS
-    {
-        // Rotate the array left by one
-        fishes.rotate_left(1);
-        // The fishes that were at zero -> should be at index 8 (new) and 6
-        fishes[6] += fishes[8];
-    }
-    
-    println!("{}", fishes.iter().sum::<usize>());
-}
-
-#[allow(dead_code)]
-fn old_method() {
-    const DAYS: usize = 80;
-    
-    let input = fs::read_to_string("src/inputs/day6.txt").unwrap();
-    let input: Vec<&str> = input.split(",").collect();
-    let mut input: Vec<u32> = input.into_iter().map(|val| val.parse::<u32>().unwrap()).collect();
-    // let mut input = [1,2,3].to_vec();
-    
-    
-    
-    for _ in 0..DAYS {
-        let mut new_fish: usize = 0;
-        for fish_timer in &mut input {
-            if fish_timer == &0 {
-                *fish_timer = 6;
-                new_fish += 1;
-            } else {
-                *fish_timer -= 1;
+    // (pos, fuel_cons)
+    let mut fuel_consumption: Vec<u32> = Vec::new();
+    for pos in min..max {
+        let total_fuel_cons = init_crab_pos.iter().map(|crab_pos| {
+            // PART 2: This is inefficient, but I can't be bothered to optimize it
+            let mut diff: i32 = (*crab_pos as i32) - (pos as i32);
+            if diff < 0 {
+                diff = -1 * diff;
             }
-        }
-        
-        for _ in 0..new_fish {
-            input.push(8);
-        }
+            let fuel_cons = (1..diff+1).sum::<i32>();
+            
+            // PART 1
+            // let mut fuel_cons: i32 = (*crab_pos as i32) - (pos as i32);
+            // if fuel_cons < 0 {
+            //     fuel_cons = -1 * fuel_cons;
+            // }
+            // fuel_cons as u32
+            fuel_cons as u32
+        }).sum::<u32>();
+    
+        fuel_consumption.push(total_fuel_cons);
     }
     
-    println!("The population is now: {}", input.len());
+    println!("{}", fuel_consumption.iter().min().unwrap());
 }
