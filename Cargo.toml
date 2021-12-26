@@ -13,3 +13,4 @@ colored = "2.0.0"
 grid = "0.6.0"
 serde = { version = "1.0.132", features = ["derive"] }
 serde_json = "1.0"
+image = "0.23.14"
