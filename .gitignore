@@ -1,3 +1,5 @@
 **/target
 **/.DS_STORE
 **/node_modules
+**/day*.iml
+.idea
