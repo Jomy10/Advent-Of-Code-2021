@@ -3,3 +3,5 @@ My code for Advent Of Code 2021. Written in Rust as that is what I am learning a
 Be warned, it is quite messy. Also, I am in no means an expert, this is just for fun and to develop my Rust skills.
 
 Looking at what other people have come up with, it seems like I still have a lot that I can learn from this language.
+
+After day 10 I decided to make a separate project for each day.

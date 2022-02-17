@@ -1,6 +1,3 @@
-/target
-.DS_STORE
-/src/day3/node/node_modules
-
-# https://stackoverflow.com/a/38771180
+**/target
 **/.DS_STORE
+**/node_modules
