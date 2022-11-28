@@ -1,5 +1,23 @@
-**/target
+# macOS
 **/.DS_STORE
-**/node_modules
+
+# IntelliJ
 **/day*.iml
 .idea
+
+# Helix
+.ignore
+
+# Rust
+**/target
+
+#zig
+**/zig-cache
+**/zig-out
+
+# swift
+**/.build
+**/.swiftpm
+
+# Node
+**/node_modules
