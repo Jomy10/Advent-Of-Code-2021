@@ -7,7 +7,7 @@
 
 // Convert input as hexadecimal string to binary string
 const char* hexToBin(const char* hex, int hexLen) {
-  char* bin = malloc(hexLen *  4);
+  char* bin = malloc(hexLen *  4 + 1);
   
   for (int i = 0; i < hexLen; i++) {
     switch(hex[i]) {
@@ -28,7 +28,7 @@ const char* hexToBin(const char* hex, int hexLen) {
       case 'E': strcpy(bin + i*4, "1110"); break;
       case 'F': strcpy(bin + i*4, "1111"); break;
       default:
-        printf("Invalid hexadecimal character %c\n", hex[i]);
+        printf("Invalid hexadecimal character \"%c\"\n", hex[i]);
     }
   }
   
@@ -72,14 +72,8 @@ bool readLiteralBits(transm_t* transm, char* buf) {
   transm->ptr += 1;
   // char* next = malloc(sizeof(char) * 4);
   for (int i = 0; i < 4; i++) {
-    printf("Adding (idx %i)\n", i);
     buf[i] = *(transm->bin + transm->ptr + i);
-    printf("Added (idx %i)\n", i);
   }
-  
-  printf("Increasing ptr %i %p\n", transm->ptr, transm);
-  
-  fflush(stdout);
   
   transm->ptr += 4;
   
@@ -88,9 +82,6 @@ bool readLiteralBits(transm_t* transm, char* buf) {
   //   .val = next,
   // };
   
-  printf("Returning (first %i)\n", first);
-  fflush(stdout);
-  
   return first;
 }
 
@@ -98,25 +89,20 @@ bool readLiteralBits(transm_t* transm, char* buf) {
 int readLiteral(transm_t* transm) {
   int totalCap = 16;
   int totalPtr = 0;
-  printf("Alocating\n");
-  fflush(stdout);
-  char* total = malloc(totalCap);
-  printf("Alloced total: %p\n", total);
+  char* total = malloc(totalCap + 1);
   char buf[4];
   while (readLiteralBits(transm, buf)) {
     if (totalCap == totalPtr) {
       totalCap += 16;
-      total = realloc(total, totalCap);
+      total = realloc(total, totalCap + 1);
     }
     for (int i = 0; i < 4; i++) {
       total[totalPtr++] = buf[i];
     }
   }
-  printf("Read all literals\n");
-  fflush(stdout);
   if (totalCap == totalPtr) {
     totalCap += 16;
-    total = realloc(total, sizeof(char) * totalCap);
+    total = realloc(total, totalCap + 1);
   }
   for (int i = 0; i < 4; i++) {
     total[totalPtr++] = buf[i];
@@ -140,7 +126,6 @@ int readLengthTypeId(transm_t* transm) {
 int readLengthSubPackets(transm_t* transm) {
   int lengthOfSubPackets = binToInt(transm->bin + transm->ptr, 15);
   transm->ptr += 15;
-  // printf("Length in bits of sub packets = %i\n", lengthOfSubPackets);
   return lengthOfSubPackets;
 }
 
@@ -148,7 +133,6 @@ int readLengthSubPackets(transm_t* transm) {
 int readNumSubPackets(transm_t* transm) {
   int num = binToInt(transm->bin + transm->ptr, 11);
   transm->ptr += 11;
-  // printf("Number of sub packets = %i\n", num);
   return num;
 }
 
@@ -163,45 +147,35 @@ struct Nodes readOperatorValue(int code, transm_t* transm) {
   nodes.len = 0;
   
   int lengthTypeId = readLengthTypeId(transm);
-  // printf("== lengthTypeId = %i ==\n", lengthTypeId);
   if (lengthTypeId == 0) {
     int lengthSubPacketsBits = readLengthSubPackets(transm);
     int startPtr = transm->ptr;
-    // printf("- bit len = %i\n", lengthSubPacketsBits);
     while(transm->ptr < startPtr + lengthSubPacketsBits) {
-      // printf("> Reading packet (bit %i)...\n", nodes.len);
+      // Bound check
       if (nodes.len == nodesCap) {
         nodesCap *= 2;
         nodes.nodes = realloc(nodes.nodes, sizeof(void*) * nodesCap);
       }
-      
-      // nodes.nodes[nodes.len * sizeof(struct Node)] = readSubPacket(transm);
-      // nodes.len += 1;
+      // assign sub packet to nodes->nodes
       readNextSubPacket(&nodes, transm);
-      
-      // printf("Got node %p\n", nodes.nodes[(nodes.len - 1)]);
     }
 
     if (transm->ptr > startPtr + lengthSubPacketsBits) {
       printf("ERROR: ptr is %i, should be %i\n", transm->ptr, startPtr + lengthSubPacketsBits);
       exit(1);
     }
-    
-    // printf("Ptr = %i, start + len = %i\n", transm->ptr, startPtr + lengthSubPacketsBits);
-
-    // printf("> Done (bit).\n");
   } else {
     int numSubPackets = readNumSubPackets(transm);
-    // printf("- num packets = %i\n", numSubPackets);
     while (numSubPackets > 0) {
-      // printf("> Reading packet (num)...\n");
-      // nodes.nodes[nodes.len * sizeof(struct Node)] = readSubPacket(transm);
-      // nodes.len += 1;
+      // Bound check
+      if (nodes.len == nodesCap) {
+        nodesCap *= 2;
+        nodes.nodes = realloc(nodes.nodes, sizeof(void*) * nodesCap);
+      }
+      // assign sub packet to nodes->nodes
       readNextSubPacket(&nodes, transm);
-      // printf("Got node %p\n", nodes.nodes[(nodes.len - 1)]);
       numSubPackets--;
     }
-    // printf("> Done.\n");
   }
   
   return nodes;
@@ -209,19 +183,12 @@ struct Nodes readOperatorValue(int code, transm_t* transm) {
 
 void readNextSubPacket(struct Nodes* nodes, transm_t* transm) {
   node_t* packet = readSubPacket(transm);
-  // printf("Packet: %p\n", packet);
   nodes->nodes[nodes->len] = packet;
-  // printf("Packet2: %p\n", nodes->nodes[nodes->len]);
   nodes->len += 1;
 }
 
 node_t* parse(transm_t* transm) {
-  node_t* node = malloc(sizeof(struct Node));
-  
-  if (node == NULL) {
-    printf("Allocation error\n");
-    exit(1);
-  }
+  node_t* node = malloc(sizeof(node_t));
   
   int version = readPacketVersion(transm);
   int typeId = readPacketTypeId(transm);

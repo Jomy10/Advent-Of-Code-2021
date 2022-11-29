@@ -93,18 +93,6 @@ fn pathfind(allocator: std.mem.Allocator, input: *const Grid, end: Vec2) !u32 {
     var cost_so_far = AutoHashMap(Vec2, u32).init(allocator);
     defer cost_so_far.deinit();
 
-    // const row_len = input.items[0].len;
-    // const row_len =
-    // const bound = Vec2{
-    //     .x = @truncate(u32, row_len),
-    //     .y = @truncate(u32, input.len),
-    // };
-
-    // const end = Vec2{
-    //     .x = @truncate(u32, row_len - 1),
-    //     .y = @truncate(u32, input.len - 1),
-    // };
-
     var _current = frontier.pop();
     while (_current != null) : (_current = frontier.pop()) {
         var current = _current.?;
@@ -198,11 +186,6 @@ fn neighbours(pos: Vec2, bounds: Vec2) [4]?Vec2 {
         _neighbours[3].?.y += 1;
     }
     return _neighbours;
-}
-
-/// Process input for part 2
-fn processInput(input: *const Vec(Vec(u8))) *const Vec(Vec(u8)) {
-    return input;
 }
 
 const expect = std.testing.expect;
