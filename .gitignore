@@ -8,6 +8,12 @@
 # Helix
 .ignore
 
+# VSCode
+**/.vscode
+
+# Beaver build tool
+**/.beaver
+
 # Rust
 **/target
 
@@ -21,3 +27,6 @@
 
 # Node
 **/node_modules
+
+# C (out dir)
+**/out
