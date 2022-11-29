@@ -3,6 +3,6 @@
 
 #include "node.h"
 
-int countPacketVersions(node_t* node);
+int countPacketVersions(const node_t* node);
 
 #endif

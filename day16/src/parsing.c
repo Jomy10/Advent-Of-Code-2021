@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
@@ -36,12 +37,12 @@ const char* hexToBin(const char* hex, int hexLen) {
 }
 
 // Binary string to integer
-int binToInt(const char* bin, int binLen) {
+uint64_t binToInt(const char* bin, int binLen) {
   int i = 0;
-  int total = 0;
+  uint64_t total = 0;
   while (i < binLen) {
     char bit = bin[binLen - i - 1];
-    int bitAsInt = bit - '0';
+    uint64_t bitAsInt = bit - '0';
     total += bitAsInt * pow(2, i);
     
     i++;
@@ -52,7 +53,7 @@ int binToInt(const char* bin, int binLen) {
 
 // Read in the packet number
 int readPacketVersion(transm_t* transm) {
-  int v = binToInt(transm->bin + transm->ptr, 3);
+  uint64_t v = binToInt(transm->bin + transm->ptr, 3);
   transm->ptr += 3;
   // printf("Version = %i\n", v);
   return v;
@@ -86,9 +87,10 @@ bool readLiteralBits(transm_t* transm, char* buf) {
 }
 
 // Returns the value of the literal
-int readLiteral(transm_t* transm) {
+uint64_t readLiteral(transm_t* transm) {
   int totalCap = 16;
   int totalPtr = 0;
+  // is a string containing 1 or 0 (as ASCII)
   char* total = malloc(totalCap + 1);
   char buf[4];
   while (readLiteralBits(transm, buf)) {
@@ -108,7 +110,15 @@ int readLiteral(transm_t* transm) {
     total[totalPtr++] = buf[i];
   }
   
-  int literal = binToInt(total, totalPtr);
+  // printf("Total = ");
+  // for (int i = 0; i < totalPtr; i++) {
+  //   printf("%c", total[i]);
+  // }
+  // printf("\n");
+  
+  uint64_t literal = binToInt(total, totalPtr);
+  
+  // printf("Literal = %llu\n", literal);
   
   free(total);
   
@@ -193,7 +203,7 @@ node_t* parse(transm_t* transm) {
   int version = readPacketVersion(transm);
   int typeId = readPacketTypeId(transm);
   if (typeId == 4) {
-    int literal = readLiteral(transm);
+    uint64_t literal = readLiteral(transm);
     node->type = LiteralValue;
     node->packetVersion = version;
     node->literal.value = literal;

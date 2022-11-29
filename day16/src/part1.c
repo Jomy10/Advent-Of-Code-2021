@@ -3,7 +3,7 @@
 
 #include <stdio.h> // TODO: remove
 
-int countPacketVersions(node_t* node) {
+int countPacketVersions(const node_t* node) {
   int total = 0;
   
   total += node->packetVersion;

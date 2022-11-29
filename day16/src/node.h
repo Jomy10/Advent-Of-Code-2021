@@ -1,6 +1,8 @@
 #ifndef AOC16_NODE_H
 #define AOC16_NODE_H
 
+#include <stdint.h>
+
 enum NodeType {
   LiteralValue,
   Operator,
@@ -16,7 +18,7 @@ typedef struct Node {
   int packetVersion;
   union {
     struct {
-      int value;
+      uint64_t value;
     } literal;
 
     struct {

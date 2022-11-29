@@ -1,17 +1,18 @@
 #ifndef AOC16_PARSING_H
 #define AOC16_PARSING_H
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "transmission.h"
 #include "node.h"
 
 const char* hexToBin(const char* hex, int hexLen);
-int binToInt(const char* bin, int binLen);
+uint64_t binToInt(const char* bin, int binLen);
 int readPacketVersion(transm_t* transm);
 int readPacketTypeId(transm_t* transm);
 bool readLiteralBits(transm_t* transm, char buf[4]);
-int readLiteral(transm_t* transm);
+uint64_t readLiteral(transm_t* transm);
 int readLengthTypeId(transm_t* transm);
 int readLengthSubPackets(transm_t* transm);
 int readNumSubPackets(transm_t* transm);
