@@ -55,7 +55,6 @@ uint64_t binToInt(const char* bin, int binLen) {
 int readPacketVersion(transm_t* transm) {
   uint64_t v = binToInt(transm->bin + transm->ptr, 3);
   transm->ptr += 3;
-  // printf("Version = %i\n", v);
   return v;
 }
 
@@ -63,7 +62,6 @@ int readPacketVersion(transm_t* transm) {
 int readPacketTypeId(transm_t* transm) {
   int t = binToInt(transm->bin + transm->ptr, 3);
   transm->ptr += 3;
-  // printf("TypeId = %i\n", t);
   return t;
 }
 
@@ -71,17 +69,11 @@ int readPacketTypeId(transm_t* transm) {
 bool readLiteralBits(transm_t* transm, char* buf) {
   int first = binToInt(transm->bin + transm->ptr, 1);
   transm->ptr += 1;
-  // char* next = malloc(sizeof(char) * 4);
   for (int i = 0; i < 4; i++) {
     buf[i] = *(transm->bin + transm->ptr + i);
   }
   
   transm->ptr += 4;
-  
-  // struct LiteralBit lb = {
-  //   .readNext = first,
-  //   .val = next,
-  // };
   
   return first;
 }
@@ -110,15 +102,7 @@ uint64_t readLiteral(transm_t* transm) {
     total[totalPtr++] = buf[i];
   }
   
-  // printf("Total = ");
-  // for (int i = 0; i < totalPtr; i++) {
-  //   printf("%c", total[i]);
-  // }
-  // printf("\n");
-  
   uint64_t literal = binToInt(total, totalPtr);
-  
-  // printf("Literal = %llu\n", literal);
   
   free(total);
   

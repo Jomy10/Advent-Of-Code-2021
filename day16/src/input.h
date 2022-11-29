@@ -1,5 +1,3 @@
 #include <stdio.h>
 
-char* readInput(char* fileName) {
-  return NULL;
-}
+char* readInput(char* fileName);
